@@ -11,12 +11,13 @@ import { Footer } from "./components/Footer";
 import { PreviewProducts } from "./components/PreviewProducts";
 import { LoginModal } from "./components/LoginModal";
 import { AdminProductForm } from "./components/AdminProductForm";
+import { ProductDetail } from "./components/ProductDetail";
 import { supabase } from "./lib/supabaseClient";
 import { NAV_ITEMS, PRODUCTS } from "./data/content";
 import type { FlowerProduct } from "./data/content";
 import type { CartItem } from "./types/cart";
 
-type View = "home" | "products" | "cart" | "custom";
+type View = "home" | "products" | "cart" | "custom" | "product-detail";
 type AuthCredentials = { email: string; password: string };
 
 const App = () => {
@@ -25,10 +26,16 @@ const App = () => {
   const [selectedOccasion, setSelectedOccasion] = useState<
     FlowerProduct["occasion"] | null
   >(null);
+  const [selectedCategory, setSelectedCategory] = useState<
+    FlowerProduct["category"] | null
+  >(null);
   const [products, setProducts] = useState<FlowerProduct[]>(PRODUCTS);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [authLoading, setAuthLoading] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<FlowerProduct | null>(
+    null
+  );
 
   const totalItems = useMemo(
     () => cartItems.reduce((total, item) => total + item.quantity, 0),
@@ -81,6 +88,12 @@ const App = () => {
   const handleSelectOccasion = (occasion: FlowerProduct["occasion"]) => {
     setSelectedOccasion(occasion);
     setActiveView("products");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleProductClick = (product: FlowerProduct) => {
+    setSelectedProduct(product);
+    setActiveView("product-detail");
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -204,7 +217,7 @@ const App = () => {
   return (
     <div className="app-shell">
       <Header
-        activeView={activeView}
+        activeView={activeView === "product-detail" ? "products" : activeView}
         totalItems={totalItems}
         navItems={NAV_ITEMS}
         onNavigate={handleNavigate}
@@ -240,6 +253,9 @@ const App = () => {
               products={products}
               onAddToCart={handleAddToCart}
               selectedOccasion={selectedOccasion}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+              onProductClick={handleProductClick}
             />
           </div>
         )}
@@ -262,6 +278,16 @@ const App = () => {
             <CustomOrderForm />
             <ReviewsSection compact />
             <LocationSection compact />
+          </div>
+        )}
+
+        {activeView === "product-detail" && selectedProduct && (
+          <div className="fade-in" key="product-detail">
+            <ProductDetail
+              product={selectedProduct}
+              onAddToCart={handleAddToCart}
+              onBack={() => handleNavigate("products")}
+            />
           </div>
         )}
       </main>

@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import type { FlowerProduct } from "../data/content";
+import { PRODUCT_CATEGORIES } from "../data/content";
+import { supabase } from "../lib/supabaseClient";
 
 type AdminProductFormProps = {
   onAddProduct: (product: Omit<FlowerProduct, "id">) => void;
@@ -15,6 +17,7 @@ type ProductDraft = {
   image: string;
   size: FlowerProduct["size"];
   occasion: FlowerProduct["occasion"];
+  category: FlowerProduct["category"];
   colors: string;
 };
 
@@ -25,6 +28,7 @@ const INITIAL_DRAFT: ProductDraft = {
   image: "",
   size: "Classic",
   occasion: "Everyday",
+  category: "buket-bunga",
   colors: "#f9c7cf, #fff4f6, #dbeee2",
 };
 
@@ -36,6 +40,9 @@ export const AdminProductForm = ({
   const [draft, setDraft] = useState<ProductDraft>(INITIAL_DRAFT);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleChange =
     (field: keyof ProductDraft) =>
@@ -48,46 +55,126 @@ export const AdminProductForm = ({
       setError(null);
     };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("File harus berupa gambar.");
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Ukuran file maksimal 5MB.");
+      return;
+    }
+
+    setImageFile(file);
+    setError(null);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const uploadImage = async (file: File): Promise<string> => {
+    const fileExt = file.name.split(".").pop();
+    const fileName = `${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(7)}.${fileExt}`;
+    const filePath = `products/${fileName}`;
+
+    const { error: uploadError, data } = await supabase.storage
+      .from("product-images")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw new Error(`Upload gagal: ${uploadError.message}`);
+    }
+
+    const {
+      data: { publicUrl },
+    } = supabase.storage.from("product-images").getPublicUrl(filePath);
+
+    return publicUrl;
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const priceValue = Number(draft.price.replace(/[^\d]/g, ""));
+    setError(null);
+    setUploading(true);
 
-    if (
-      !draft.name.trim() ||
-      !draft.description.trim() ||
-      !draft.image.trim()
-    ) {
-      setError("Pastikan semua field terisi.");
-      return;
+    try {
+      const priceValue = Number(draft.price.replace(/[^\d]/g, ""));
+
+      if (!draft.name.trim() || !draft.description.trim()) {
+        setError("Pastikan nama dan deskripsi terisi.");
+        setUploading(false);
+        return;
+      }
+
+      if (!imageFile && !draft.image.trim()) {
+        setError("Pilih gambar atau masukkan URL gambar.");
+        setUploading(false);
+        return;
+      }
+
+      if (!priceValue || priceValue <= 0) {
+        setError("Masukkan harga yang valid.");
+        setUploading(false);
+        return;
+      }
+
+      // Upload image if file is selected
+      let imageUrl = draft.image.trim();
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      }
+
+      const colorPalette = draft.colors
+        .split(",")
+        .map((color) => color.trim())
+        .filter(Boolean)
+        .map((color) => (color.startsWith("#") ? color : `#${color}`));
+
+      onAddProduct({
+        name: draft.name.trim(),
+        description: draft.description.trim(),
+        image: imageUrl,
+        price: priceValue,
+        size: draft.size,
+        occasion: draft.occasion,
+        category: draft.category,
+        colorPalette:
+          colorPalette.length > 0
+            ? colorPalette
+            : ["#f9dce4", "#fdeff2", "#dbeee1"],
+      });
+
+      setSuccess(true);
+      setDraft((prev) => ({
+        ...INITIAL_DRAFT,
+        occasion: prev.occasion,
+        category: prev.category,
+      }));
+      setImageFile(null);
+      setImagePreview(null);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Terjadi kesalahan saat upload."
+      );
+    } finally {
+      setUploading(false);
     }
-
-    if (!priceValue || priceValue <= 0) {
-      setError("Masukkan harga yang valid.");
-      return;
-    }
-
-    const colorPalette = draft.colors
-      .split(",")
-      .map((color) => color.trim())
-      .filter(Boolean)
-      .map((color) => (color.startsWith("#") ? color : `#${color}`));
-
-    onAddProduct({
-      name: draft.name.trim(),
-      description: draft.description.trim(),
-      image: draft.image.trim(),
-      price: priceValue,
-      size: draft.size,
-      occasion: draft.occasion,
-      colorPalette:
-        colorPalette.length > 0
-          ? colorPalette
-          : ["#f9dce4", "#fdeff2", "#dbeee1"],
-    });
-
-    setSuccess(true);
-    setDraft((prev) => ({ ...INITIAL_DRAFT, occasion: prev.occasion }));
-    setTimeout(() => setSuccess(false), 3000);
   };
 
   return (
@@ -126,14 +213,48 @@ export const AdminProductForm = ({
               required
             />
           </label>
-          <label className="form-field">
-            <span>URL Foto Buket</span>
+          <label className="form-field form-field--file">
+            <span>Foto Produk</span>
+            <div className="file-upload-wrapper">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleImageChange}
+                className="file-input"
+                id="product-image-upload"
+              />
+              <label
+                htmlFor="product-image-upload"
+                className="file-upload-label"
+              >
+                {imageFile ? "Ganti Foto" : "Pilih Foto dari Komputer"}
+              </label>
+              {imageFile && <span className="file-name">{imageFile.name}</span>}
+            </div>
+            {imagePreview && (
+              <div className="image-preview">
+                <img src={imagePreview} alt="Preview" />
+                <button
+                  type="button"
+                  className="remove-preview"
+                  onClick={() => {
+                    setImageFile(null);
+                    setImagePreview(null);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            )}
+            <div className="file-upload-divider">
+              <span>atau</span>
+            </div>
             <input
               type="url"
               value={draft.image}
               onChange={handleChange("image")}
-              placeholder="https://..."
-              required
+              placeholder="Masukkan URL gambar (opsional jika sudah upload)"
+              className="url-input-fallback"
             />
           </label>
           <label className="form-field form-field--textarea">
@@ -163,6 +284,16 @@ export const AdminProductForm = ({
               <option value="Sympathy">Sympathy</option>
             </select>
           </label>
+          <label className="form-field">
+            <span>Kategori</span>
+            <select value={draft.category} onChange={handleChange("category")}>
+              {PRODUCT_CATEGORIES.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.label}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="form-field form-field--textarea">
             <span>Palet Warna (pisahkan dengan koma)</span>
             <textarea
@@ -180,8 +311,12 @@ export const AdminProductForm = ({
         )}
 
         <div className="admin-form__actions">
-          <button type="submit" className="btn btn-primary">
-            Simpan Produk
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={uploading}
+          >
+            {uploading ? "Mengupload..." : "Simpan Produk"}
           </button>
           <button
             type="button"

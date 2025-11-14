@@ -1,19 +1,36 @@
 import type { FlowerProduct } from "../data/content";
+import { PRODUCT_CATEGORIES } from "../data/content";
 
 type ProductGridProps = {
   products: FlowerProduct[];
   onAddToCart: (product: FlowerProduct) => void;
   selectedOccasion: FlowerProduct["occasion"] | null;
+  selectedCategory: FlowerProduct["category"] | null;
+  onSelectCategory: (category: FlowerProduct["category"] | null) => void;
+  onProductClick: (product: FlowerProduct) => void;
 };
 
 export const ProductGrid = ({
   products,
   onAddToCart,
   selectedOccasion,
+  selectedCategory,
+  onSelectCategory,
+  onProductClick,
 }: ProductGridProps) => {
-  const filteredProducts = selectedOccasion
-    ? products.filter((product) => product.occasion === selectedOccasion)
-    : products;
+  let filteredProducts = products;
+
+  if (selectedCategory) {
+    filteredProducts = filteredProducts.filter(
+      (product) => product.category === selectedCategory
+    );
+  }
+
+  if (selectedOccasion) {
+    filteredProducts = filteredProducts.filter(
+      (product) => product.occasion === selectedOccasion
+    );
+  }
 
   return (
     <section className="products-page">
@@ -26,11 +43,36 @@ export const ProductGrid = ({
         </p>
       </div>
 
+      <div className="category-filters">
+        <button
+          className={`category-filter-btn ${
+            selectedCategory === null ? "category-filter-btn--active" : ""
+          }`}
+          onClick={() => onSelectCategory(null)}
+        >
+          Semua Kategori
+        </button>
+        {PRODUCT_CATEGORIES.map((category) => (
+          <button
+            key={category.id}
+            className={`category-filter-btn ${
+              selectedCategory === category.id
+                ? "category-filter-btn--active"
+                : ""
+            }`}
+            onClick={() => onSelectCategory(category.id)}
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+
       <div className="product-grid">
         {filteredProducts.map((product) => (
           <article
             key={product.id}
-            className="product-card product-card--detailed"
+            className="product-card product-card--detailed product-card--clickable"
+            onClick={() => onProductClick(product)}
           >
             <figure className="product-image">
               <img src={product.image} alt={product.name} loading="lazy" />
@@ -56,7 +98,10 @@ export const ProductGrid = ({
                 </span>
                 <button
                   className="btn btn-primary"
-                  onClick={() => onAddToCart(product)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddToCart(product);
+                  }}
                 >
                   Tambah ke Keranjang
                 </button>

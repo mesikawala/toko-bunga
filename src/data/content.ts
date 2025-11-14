@@ -7,7 +7,15 @@ export type FlowerProduct = {
   size: "Petite" | "Classic" | "Grand";
   occasion: "Romantic" | "Celebration" | "Sympathy" | "Everyday";
   colorPalette: string[];
+  category: "buket-bunga" | "bunga-meja" | "modern-pastel-flower" | "papan-bunga-congratulation";
 };
+
+export const PRODUCT_CATEGORIES = [
+  { id: "buket-bunga", label: "Buket Bunga" },
+  { id: "bunga-meja", label: "Bunga Meja" },
+  { id: "modern-pastel-flower", label: "Modern Pastel Flower" },
+  { id: "papan-bunga-congratulation", label: "Papan Bunga Congratulation" },
+] as const;
 
 export type Review = {
   id: string;
@@ -65,161 +73,286 @@ export const FEATURED_OCCASIONS: {
 ];
 
 export const INITIAL_PRODUCTS: FlowerProduct[] = [
+  // Kategori: Buket Bunga
   {
-    id: "blush-aurora",
-    name: "Blush Aurora",
+    id: "buket-romantic-blush",
+    name: "Buket Romantic Blush",
     description:
-      "Rangkaian mawar asil pastel dengan ranunculus dan eucalyptus silver dollar untuk nuansa romantis yang lembut.",
+      "Rangkaian mawar pastel dengan ranunculus dan eucalyptus silver dollar untuk nuansa romantis yang lembut. Sempurna untuk menyampaikan rasa sayang.",
     price: 650000,
     image:
       "https://images.unsplash.com/photo-1468327768560-75b778cbb551?auto=format&fit=crop&w=900&q=80",
     size: "Classic",
     occasion: "Romantic",
     colorPalette: ["#f9c7cf", "#fae9ed", "#dfeeea"],
+    category: "buket-bunga",
   },
   {
-    id: "morning-dew",
-    name: "Morning Dew",
+    id: "buket-celebration-pastel",
+    name: "Buket Celebration Pastel",
     description:
-      "Peony putih, lisianthus, dan daun olive memberikan kesan bersih, tulus, dan menenangkan.",
-    price: 720000,
-    image:
-      "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=80",
-    size: "Grand",
-    occasion: "Sympathy",
-    colorPalette: ["#ffffff", "#f7f7f7", "#d5e8da"],
-  },
-  {
-    id: "sugar-petal",
-    name: "Sugar Petal",
-    description:
-      "Campuran gerbera, spray rose, dan baby breath bernuansa pink pastel yang ceria namun elegan.",
+      "Campuran gerbera, spray rose, dan baby breath bernuansa pink pastel yang ceria namun elegan. Cocok untuk merayakan momen bahagia.",
     price: 540000,
     image:
       "https://images.unsplash.com/photo-1527885572883-8193da44d1d3?auto=format&fit=crop&w=900&q=80",
     size: "Petite",
     occasion: "Celebration",
     colorPalette: ["#fcb7c8", "#fff5f8", "#e2f0e8"],
+    category: "buket-bunga",
   },
   {
-    id: "sage-whisper",
-    name: "Sage Whisper",
+    id: "buket-elegant-white",
+    name: "Buket Elegant White",
     description:
-      "Anthurium hijau pucat bertemu mawar krem dan hydrangea putih untuk komposisi kontemporer.",
-    price: 690000,
+      "Peony putih, lisianthus, dan daun olive memberikan kesan bersih, tulus, dan menenangkan. Ideal untuk berbagai momen spesial.",
+    price: 720000,
     image:
-      "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80",
-    size: "Classic",
-    occasion: "Everyday",
-    colorPalette: ["#fdf7f4", "#e4f1e6", "#c8d8cd"],
+      "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=900&q=80",
+    size: "Grand",
+    occasion: "Sympathy",
+    colorPalette: ["#ffffff", "#f7f7f7", "#d5e8da"],
+    category: "buket-bunga",
   },
   {
-    id: "petite-souvenir",
-    name: "Petite Souvenir",
+    id: "buket-sweet-mini",
+    name: "Buket Sweet Mini",
     description:
-      "Mini buket mawar spray dan wax flower, favorit untuk hadiah spontan penuh manis.",
+      "Mini buket mawar spray dan wax flower, favorit untuk hadiah spontan penuh manis. Ukuran compact yang mudah dibawa.",
     price: 320000,
     image:
       "https://images.unsplash.com/photo-1509042239860-f55d1f475aa1?auto=format&fit=crop&w=900&q=80",
     size: "Petite",
     occasion: "Everyday",
     colorPalette: ["#ffe4ec", "#fff8f1", "#d8ede1"],
+    category: "buket-bunga",
+  },
+  // Kategori: Bunga Meja
+  {
+    id: "meja-classic-pastel",
+    name: "Bunga Meja Classic Pastel",
+    description:
+      "Rangkaian bunga meja elegan dengan kombinasi mawar pastel, eucalyptus, dan baby breath. Sempurna untuk menghias meja makan atau meja kerja dengan sentuhan natural yang menenangkan.",
+    price: 450000,
+    image:
+      "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=80",
+    size: "Petite",
+    occasion: "Everyday",
+    colorPalette: ["#f9dce4", "#fff7f4", "#dbeee1"],
+    category: "bunga-meja",
   },
   {
-    id: "celestial-bliss",
-    name: "Celestial Bliss",
+    id: "meja-minimalist-white",
+    name: "Bunga Meja Minimalist White",
     description:
-      "Tulip pastel dan ranunculus buttercream dengan aksen dusty miller untuk nuansa dreamy.",
+      "Komposisi bunga putih minimalis dengan mawar, eucalyptus, dan baby breath. Cocok untuk dekorasi meja kerja atau meja makan dengan gaya modern.",
+    price: 420000,
+    image:
+      "https://images.unsplash.com/photo-1521026720998-be56677c3f1d?auto=format&fit=crop&w=900&q=80",
+    size: "Petite",
+    occasion: "Everyday",
+    colorPalette: ["#fff8f1", "#f3f3f3", "#dbeade"],
+    category: "bunga-meja",
+  },
+  {
+    id: "meja-luxury-arrangement",
+    name: "Bunga Meja Luxury Arrangement",
+    description:
+      "Rangkaian bunga meja mewah dengan peony, ranunculus, dan hydrangea dalam vas elegan. Menghadirkan kesan premium untuk acara penting.",
+    price: 680000,
+    image:
+      "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=900&q=80",
+    size: "Classic",
+    occasion: "Celebration",
+    colorPalette: ["#fdeff2", "#fff5f8", "#e4f1e6"],
+    category: "bunga-meja",
+  },
+  // Kategori: Modern Pastel Flower
+  {
+    id: "modern-pastel-contemporary",
+    name: "Modern Pastel Flower Contemporary",
+    description:
+      "Komposisi bunga modern dengan palet pastel kontemporer. Menggabungkan ranunculus, peony, dan lisianthus dalam vas minimalis untuk dekorasi ruangan yang stylish dan fresh.",
+    price: 780000,
+    image:
+      "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=900&q=80",
+    size: "Grand",
+    occasion: "Celebration",
+    colorPalette: ["#fdeff2", "#fff5f8", "#e4f1e6"],
+    category: "modern-pastel-flower",
+  },
+  {
+    id: "modern-pastel-dreamy",
+    name: "Modern Pastel Flower Dreamy",
+    description:
+      "Tulip pastel dan ranunculus buttercream dengan aksen dusty miller untuk nuansa dreamy. Desain modern yang cocok untuk interior kontemporer.",
     price: 880000,
     image:
       "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80",
     size: "Grand",
     occasion: "Romantic",
     colorPalette: ["#fbe9e7", "#fdeced", "#e0f0e4"],
+    category: "modern-pastel-flower",
   },
   {
-    id: "lily-cotton",
-    name: "Lily Cotton",
+    id: "modern-pastel-lush",
+    name: "Modern Pastel Flower Lush",
     description:
-      "Lily oriental putih, rose ivory, dan pom-pom chrysanthemum untuk sentuhan modern elegan.",
-    price: 760000,
-    image:
-      "https://images.unsplash.com/photo-1519681392104-54f6c1c81d9d?auto=format&fit=crop&w=900&q=80",
-    size: "Classic",
-    occasion: "Sympathy",
-    colorPalette: ["#fff8f8", "#f1f7f2", "#d8e9dd"],
-  },
-  {
-    id: "pastel-parade",
-    name: "Pastel Parade",
-    description:
-      "Kombinasi mawar kuning pucat, carnation peach, dan viburnum hijau memberi energi baru.",
-    price: 610000,
-    image:
-      "https://images.unsplash.com/photo-1509042239860-8d5c8f4961d9?auto=format&fit=crop&w=900&q=80",
-    size: "Classic",
-    occasion: "Celebration",
-    colorPalette: ["#ffe4c9", "#fff3ed", "#d8eadc"],
-  },
-  {
-    id: "velvet-dusk",
-    name: "Velvet Dusk",
-    description:
-      "Mawar dusty rose dan hellebores plum dengan aksen eucalyptus baby blue untuk kesan dramatis.",
-    price: 710000,
-    image:
-      "https://images.unsplash.com/photo-1522682460632-1f77b81795f5?auto=format&fit=crop&w=900&q=80",
-    size: "Classic",
-    occasion: "Romantic",
-    colorPalette: ["#e0aebf", "#f2d9e1", "#cbded5"],
-  },
-  {
-    id: "spring-sonata",
-    name: "Spring Sonata",
-    description:
-      "Ranunculus peach, sweet pea putih, dan chamomile segar menghadirkan keceriaan musim semi.",
-    price: 680000,
-    image:
-      "https://images.unsplash.com/photo-1520256862855-398228c41684?auto=format&fit=crop&w=900&q=80",
-    size: "Classic",
-    occasion: "Celebration",
-    colorPalette: ["#ffd8d2", "#fff0e9", "#d8e7dc"],
-  },
-  {
-    id: "linen-breeze",
-    name: "Linen Breeze",
-    description:
-      "Kombinasi mawar putih, dried bunny tail, dan daun olive yang elegan untuk suasana minimalis.",
-    price: 590000,
-    image:
-      "https://images.unsplash.com/photo-1521026720998-be56677c3f1d?auto=format&fit=crop&w=900&q=80",
-    size: "Petite",
-    occasion: "Everyday",
-    colorPalette: ["#fff8f1", "#f3f3f3", "#dbeade"],
-  },
-  {
-    id: "garden-gleam",
-    name: "Garden Gleam",
-    description:
-      "Hydrangea pastel, mawar spray, dan viburnum hijau membentuk buket lush penuh volume.",
+      "Hydrangea pastel, mawar spray, dan viburnum hijau membentuk komposisi lush penuh volume. Gaya modern yang memukau untuk dekorasi ruangan.",
     price: 940000,
     image:
       "https://images.unsplash.com/photo-1511288598101-27e89ac85d30?auto=format&fit=crop&w=900&q=80",
     size: "Grand",
     occasion: "Celebration",
     colorPalette: ["#fde0e8", "#fff2f7", "#d8eade"],
+    category: "modern-pastel-flower",
+  },
+  // Kategori: Papan Bunga Congratulation
+  {
+    id: "papan-congratulation-elegant",
+    name: "Papan Bunga Congratulation Elegant",
+    description:
+      "Papan bunga ucapan selamat dengan desain mewah dan elegan. Dihiasi rangkaian bunga segar dalam bentuk papan yang cocok untuk wisuda, promosi, atau momen prestasi lainnya.",
+    price: 1200000,
+    image:
+      "https://images.unsplash.com/photo-1582794543139-8ac38803e6c8?auto=format&fit=crop&w=900&q=80",
+    size: "Grand",
+    occasion: "Celebration",
+    colorPalette: ["#ffe4ec", "#fff8f1", "#d8eade"],
+    category: "papan-bunga-congratulation",
   },
   {
-    id: "tender-halo",
-    name: "Tender Halo",
+    id: "papan-congratulation-luxury",
+    name: "Papan Bunga Congratulation Luxury",
     description:
-      "Lisianthus putih, mawar blush, dan pampas mini menghadirkan buket airy untuk berbagai momen.",
-    price: 670000,
+      "Papan bunga ucapan selamat dengan desain mewah dan mewah. Kombinasi bunga premium dengan dekorasi pita dan aksesori elegan untuk momen spesial.",
+    price: 1500000,
     image:
-      "https://images.unsplash.com/photo-1522048369776-57443dc33c73?auto=format&fit=crop&w=900&q=80",
+      "https://images.unsplash.com/photo-1520256862855-398228c41684?auto=format&fit=crop&w=900&q=80",
+    size: "Grand",
+    occasion: "Celebration",
+    colorPalette: ["#ffd8d2", "#fff0e9", "#d8e7dc"],
+    category: "papan-bunga-congratulation",
+  },
+  {
+    id: "papan-congratulation-grand",
+    name: "Papan Bunga Congratulation Grand",
+    description:
+      "Papan bunga ucapan selamat ukuran besar dengan rangkaian bunga segar yang melimpah. Sempurna untuk acara besar seperti wisuda atau promosi jabatan.",
+    price: 1800000,
+    image:
+      "https://images.unsplash.com/photo-1509042239860-8d5c8f4961d9?auto=format&fit=crop&w=900&q=80",
+    size: "Grand",
+    occasion: "Celebration",
+    colorPalette: ["#ffe4c9", "#fff3ed", "#d8eadc"],
+    category: "papan-bunga-congratulation",
+  },
+  // Tambahan produk Buket Bunga
+  {
+    id: "buket-spring-garden",
+    name: "Buket Spring Garden",
+    description:
+      "Rangkaian bunga segar dengan warna-warni pastel yang ceria. Kombinasi tulip, daisy, dan baby breath untuk nuansa musim semi yang menyegarkan.",
+    price: 580000,
+    image:
+      "https://images.unsplash.com/photo-1520763185298-1b434c919102?auto=format&fit=crop&w=900&q=80",
     size: "Classic",
+    occasion: "Celebration",
+    colorPalette: ["#ffe4ec", "#fff5f8", "#dbeee2"],
+    category: "buket-bunga",
+  },
+  {
+    id: "buket-lavender-dream",
+    name: "Buket Lavender Dream",
+    description:
+      "Buket elegan dengan sentuhan lavender dan ungu pastel. Mawar lavender, eucalyptus, dan statice menciptakan kesan dreamy dan romantis.",
+    price: 720000,
+    image:
+      "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=900&q=80",
+    size: "Grand",
+    occasion: "Romantic",
+    colorPalette: ["#e0d4e8", "#f5f0f8", "#d8eade"],
+    category: "buket-bunga",
+  },
+  // Tambahan produk Bunga Meja
+  {
+    id: "meja-romantic-centerpiece",
+    name: "Bunga Meja Romantic Centerpiece",
+    description:
+      "Centerpiece bunga meja dengan mawar merah muda dan peony putih. Sempurna untuk dekorasi meja makan romantis atau acara spesial.",
+    price: 550000,
+    image:
+      "https://images.unsplash.com/photo-1518895949257-7621c3c786d7?auto=format&fit=crop&w=900&q=80",
+    size: "Classic",
+    occasion: "Romantic",
+    colorPalette: ["#f9c7cf", "#fdeff2", "#dfeeea"],
+    category: "bunga-meja",
+  },
+  {
+    id: "meja-minimalist-elegance",
+    name: "Bunga Meja Minimalist Elegance",
+    description:
+      "Rangkaian bunga meja minimalis dengan fokus pada kesederhanaan dan keanggunan. Cocok untuk dekorasi meja kerja modern.",
+    price: 480000,
+    image:
+      "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=900&q=80",
+    size: "Petite",
     occasion: "Everyday",
-    colorPalette: ["#ffe8ef", "#fff5f8", "#dbeee2"],
+    colorPalette: ["#fff8f1", "#f3f3f3", "#dbeade"],
+    category: "bunga-meja",
+  },
+  // Tambahan produk Modern Pastel Flower
+  {
+    id: "modern-pastel-serenity",
+    name: "Modern Pastel Flower Serenity",
+    description:
+      "Komposisi bunga modern dengan nuansa tenang dan menenangkan. Kombinasi pastel soft yang cocok untuk ruangan dengan tema zen.",
+    price: 850000,
+    image:
+      "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=80",
+    size: "Grand",
+    occasion: "Everyday",
+    colorPalette: ["#fbe9e7", "#fdeced", "#e0f0e4"],
+    category: "modern-pastel-flower",
+  },
+  {
+    id: "modern-pastel-vibrant",
+    name: "Modern Pastel Flower Vibrant",
+    description:
+      "Rangkaian bunga modern dengan warna pastel yang lebih vibrant. Menghadirkan energi positif dan keceriaan untuk ruangan.",
+    price: 920000,
+    image:
+      "https://images.unsplash.com/photo-1511288598101-27e89ac85d30?auto=format&fit=crop&w=900&q=80",
+    size: "Grand",
+    occasion: "Celebration",
+    colorPalette: ["#fde0e8", "#fff2f7", "#d8eade"],
+    category: "modern-pastel-flower",
+  },
+  // Tambahan produk Papan Bunga Congratulation
+  {
+    id: "papan-congratulation-deluxe",
+    name: "Papan Bunga Congratulation Deluxe",
+    description:
+      "Papan bunga ucapan selamat dengan desain deluxe dan premium. Dilengkapi dengan dekorasi pita emas dan aksesori mewah.",
+    price: 2000000,
+    image:
+      "https://images.unsplash.com/photo-1582794543139-8ac38803e6c8?auto=format&fit=crop&w=900&q=80",
+    size: "Grand",
+    occasion: "Celebration",
+    colorPalette: ["#ffe4ec", "#fff8f1", "#d8eade"],
+    category: "papan-bunga-congratulation",
+  },
+  {
+    id: "papan-congratulation-standard",
+    name: "Papan Bunga Congratulation Standard",
+    description:
+      "Papan bunga ucapan selamat dengan ukuran standar. Cocok untuk berbagai acara seperti ulang tahun, promosi, atau achievement lainnya.",
+    price: 950000,
+    image:
+      "https://images.unsplash.com/photo-1520256862855-398228c41684?auto=format&fit=crop&w=900&q=80",
+    size: "Classic",
+    occasion: "Celebration",
+    colorPalette: ["#ffd8d2", "#fff0e9", "#d8e7dc"],
+    category: "papan-bunga-congratulation",
   },
 ];
 
