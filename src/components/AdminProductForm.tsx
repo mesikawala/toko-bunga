@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import type { FlowerProduct } from "../data/content";
 import { PRODUCT_CATEGORIES } from "../data/content";
@@ -6,8 +6,14 @@ import { supabase } from "../lib/supabaseClient";
 
 type AdminProductFormProps = {
   onAddProduct: (product: Omit<FlowerProduct, "id">) => void;
+  onUpdateProduct?: (
+    productId: string,
+    product: Omit<FlowerProduct, "id">
+  ) => void;
   onClearFilter: () => void;
   selectedOccasion: FlowerProduct["occasion"] | null;
+  editingProduct?: FlowerProduct | null;
+  onCancelEdit?: () => void;
 };
 
 type ProductDraft = {
@@ -34,8 +40,11 @@ const INITIAL_DRAFT: ProductDraft = {
 
 export const AdminProductForm = ({
   onAddProduct,
+  onUpdateProduct,
   onClearFilter,
   selectedOccasion,
+  editingProduct,
+  onCancelEdit,
 }: AdminProductFormProps) => {
   const [draft, setDraft] = useState<ProductDraft>(INITIAL_DRAFT);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +52,28 @@ export const AdminProductForm = ({
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+
+  // Load editing product data
+  useEffect(() => {
+    if (editingProduct) {
+      setDraft({
+        name: editingProduct.name,
+        price: editingProduct.price.toString(),
+        description: editingProduct.description,
+        image: editingProduct.image,
+        size: editingProduct.size,
+        occasion: editingProduct.occasion,
+        category: editingProduct.category,
+        colors: editingProduct.colorPalette.join(", "),
+      });
+      setImagePreview(editingProduct.image);
+      setImageFile(null);
+    } else {
+      setDraft(INITIAL_DRAFT);
+      setImagePreview(null);
+      setImageFile(null);
+    }
+  }, [editingProduct]);
 
   const handleChange =
     (field: keyof ProductDraft) =>
@@ -89,7 +120,7 @@ export const AdminProductForm = ({
       .substring(7)}.${fileExt}`;
     const filePath = `products/${fileName}`;
 
-    const { error: uploadError, data } = await supabase.storage
+    const { error: uploadError } = await supabase.storage
       .from("product-images")
       .upload(filePath, file, {
         cacheControl: "3600",
@@ -100,9 +131,9 @@ export const AdminProductForm = ({
       throw new Error(`Upload gagal: ${uploadError.message}`);
     }
 
-    const {
-      data: { publicUrl },
-    } = supabase.storage.from("product-images").getPublicUrl(filePath);
+    const { publicUrl } = supabase.storage
+      .from("product-images")
+      .getPublicUrl(filePath).data;
 
     return publicUrl;
   };
@@ -145,7 +176,7 @@ export const AdminProductForm = ({
         .filter(Boolean)
         .map((color) => (color.startsWith("#") ? color : `#${color}`));
 
-      onAddProduct({
+      const productData = {
         name: draft.name.trim(),
         description: draft.description.trim(),
         image: imageUrl,
@@ -157,17 +188,24 @@ export const AdminProductForm = ({
           colorPalette.length > 0
             ? colorPalette
             : ["#f9dce4", "#fdeff2", "#dbeee1"],
-      });
+      };
 
-      setSuccess(true);
-      setDraft((prev) => ({
-        ...INITIAL_DRAFT,
-        occasion: prev.occasion,
-        category: prev.category,
-      }));
-      setImageFile(null);
-      setImagePreview(null);
-      setTimeout(() => setSuccess(false), 3000);
+      if (editingProduct && onUpdateProduct) {
+        onUpdateProduct(editingProduct.id, productData);
+        setSuccess(true);
+        setTimeout(() => setSuccess(false), 3000);
+      } else {
+        onAddProduct(productData);
+        setSuccess(true);
+        setDraft((prev) => ({
+          ...INITIAL_DRAFT,
+          occasion: prev.occasion,
+          category: prev.category,
+        }));
+        setImageFile(null);
+        setImagePreview(null);
+        setTimeout(() => setSuccess(false), 3000);
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Terjadi kesalahan saat upload."
@@ -182,13 +220,20 @@ export const AdminProductForm = ({
       <header className="admin-panel__header">
         <div>
           <span className="eyebrow">Admin Area</span>
-          <h3>Tambah Produk Baru</h3>
+          <h3>{editingProduct ? "Edit Produk" : "Tambah Produk Baru"}</h3>
         </div>
-        {selectedOccasion && (
-          <button className="link" onClick={onClearFilter}>
-            Hapus filter occasion
-          </button>
-        )}
+        <div style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
+          {selectedOccasion && (
+            <button type="button" className="link" onClick={onClearFilter}>
+              Hapus filter occasion
+            </button>
+          )}
+          {editingProduct && onCancelEdit && (
+            <button type="button" className="link" onClick={onCancelEdit}>
+              Batal Edit
+            </button>
+          )}
+        </div>
       </header>
 
       <form className="admin-form" onSubmit={handleSubmit}>
@@ -307,7 +352,11 @@ export const AdminProductForm = ({
 
         {error && <p className="form-error">{error}</p>}
         {success && (
-          <p className="form-success">Produk berhasil ditambahkan!</p>
+          <p className="form-success">
+            {editingProduct
+              ? "Produk berhasil diupdate!"
+              : "Produk berhasil ditambahkan!"}
+          </p>
         )}
 
         <div className="admin-form__actions">
@@ -316,18 +365,26 @@ export const AdminProductForm = ({
             className="btn btn-primary"
             disabled={uploading}
           >
-            {uploading ? "Mengupload..." : "Simpan Produk"}
+            {uploading
+              ? "Mengupload..."
+              : editingProduct
+              ? "Update Produk"
+              : "Simpan Produk"}
           </button>
-          <button
-            type="button"
-            className="btn btn-ghost"
-            onClick={() => {
-              setDraft(INITIAL_DRAFT);
-              setError(null);
-            }}
-          >
-            Reset Form
-          </button>
+          {!editingProduct && (
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={() => {
+                setDraft(INITIAL_DRAFT);
+                setError(null);
+                setImageFile(null);
+                setImagePreview(null);
+              }}
+            >
+              Reset Form
+            </button>
+          )}
         </div>
       </form>
     </section>

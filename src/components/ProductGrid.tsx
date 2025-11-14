@@ -1,5 +1,6 @@
 import type { FlowerProduct } from "../data/content";
 import { PRODUCT_CATEGORIES } from "../data/content";
+import { ScrollAnimate } from "./ScrollAnimate";
 
 type ProductGridProps = {
   products: FlowerProduct[];
@@ -8,6 +9,8 @@ type ProductGridProps = {
   selectedCategory: FlowerProduct["category"] | null;
   onSelectCategory: (category: FlowerProduct["category"] | null) => void;
   onProductClick: (product: FlowerProduct) => void;
+  isAdmin?: boolean;
+  onEditProduct?: (product: FlowerProduct) => void;
 };
 
 export const ProductGrid = ({
@@ -17,6 +20,8 @@ export const ProductGrid = ({
   selectedCategory,
   onSelectCategory,
   onProductClick,
+  isAdmin,
+  onEditProduct,
 }: ProductGridProps) => {
   let filteredProducts = products;
 
@@ -34,46 +39,63 @@ export const ProductGrid = ({
 
   return (
     <section className="products-page">
-      <div className="section-heading">
-        <span className="eyebrow">Signature Collection</span>
-        <h2>Pilih buket pastel terbaik untuk menemani momenmu</h2>
-        <p>
-          Setiap buket dibuat berdasarkan pesanan dan dapat disesuaikan dengan
-          preferensi warna, ukuran, maupun sentuhan dekoratif tambahan.
-        </p>
-      </div>
+      <ScrollAnimate animation="fadeInUp" delay={0}>
+        <div className="section-heading">
+          <span className="eyebrow">Signature Collection</span>
+          <h2>Pilih buket pastel terbaik untuk menemani momenmu</h2>
+          <p>
+            Setiap buket dibuat berdasarkan pesanan dan dapat disesuaikan dengan
+            preferensi warna, ukuran, maupun sentuhan dekoratif tambahan.
+          </p>
+        </div>
+      </ScrollAnimate>
 
-      <div className="category-filters">
-        <button
-          className={`category-filter-btn ${
-            selectedCategory === null ? "category-filter-btn--active" : ""
-          }`}
-          onClick={() => onSelectCategory(null)}
-        >
-          Semua Kategori
-        </button>
-        {PRODUCT_CATEGORIES.map((category) => (
+      <ScrollAnimate animation="fadeIn" delay={200}>
+        <div className="category-filters">
           <button
-            key={category.id}
             className={`category-filter-btn ${
-              selectedCategory === category.id
-                ? "category-filter-btn--active"
-                : ""
+              selectedCategory === null ? "category-filter-btn--active" : ""
             }`}
-            onClick={() => onSelectCategory(category.id)}
+            onClick={() => onSelectCategory(null)}
           >
-            {category.label}
+            Semua Kategori
           </button>
-        ))}
-      </div>
+          {PRODUCT_CATEGORIES.map((category) => (
+            <button
+              key={category.id}
+              className={`category-filter-btn ${
+                selectedCategory === category.id
+                  ? "category-filter-btn--active"
+                  : ""
+              }`}
+              onClick={() => onSelectCategory(category.id)}
+            >
+              {category.label}
+            </button>
+          ))}
+        </div>
+      </ScrollAnimate>
 
       <div className="product-grid">
-        {filteredProducts.map((product) => (
-          <article
-            key={product.id}
-            className="product-card product-card--detailed product-card--clickable"
-            onClick={() => onProductClick(product)}
-          >
+        {filteredProducts.map((product, index) => {
+          const animation =
+            index % 4 === 0
+              ? "fadeInLeft"
+              : index % 4 === 1
+              ? "fadeInRight"
+              : index % 4 === 2
+              ? "fadeInUp"
+              : "fadeIn";
+          return (
+            <ScrollAnimate
+              key={product.id}
+              animation={animation}
+              delay={100 * (index % 4)}
+            >
+              <article
+                className="product-card product-card--detailed product-card--clickable"
+                onClick={() => onProductClick(product)}
+              >
             <figure className="product-image">
               <img src={product.image} alt={product.name} loading="lazy" />
             </figure>
@@ -96,19 +118,35 @@ export const ProductGrid = ({
                     maximumFractionDigits: 0,
                   })}
                 </span>
-                <button
-                  className="btn btn-primary"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onAddToCart(product);
-                  }}
-                >
-                  Tambah ke Keranjang
-                </button>
+                <div className="product-footer-actions">
+                  {isAdmin && onEditProduct && (
+                    <button
+                      className="btn btn-ghost btn-small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditProduct(product);
+                      }}
+                      title="Edit Produk"
+                    >
+                      ✏️ Edit
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-primary"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onAddToCart(product);
+                    }}
+                  >
+                    Tambah ke Keranjang
+                  </button>
+                </div>
               </div>
             </div>
-          </article>
-        ))}
+              </article>
+            </ScrollAnimate>
+          );
+        })}
       </div>
     </section>
   );

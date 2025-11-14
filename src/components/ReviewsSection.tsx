@@ -1,4 +1,5 @@
 import { REVIEWS } from "../data/content";
+import { ScrollAnimate } from "./ScrollAnimate";
 
 type ReviewsSectionProps = {
   compact?: boolean;
@@ -10,17 +11,20 @@ export const ReviewsSection = ({ compact = false }: ReviewsSectionProps) => {
       className={`reviews-section ${compact ? "reviews-section--compact" : ""}`}
     >
       {!compact && (
-        <div className="section-heading">
-          <span className="eyebrow">Cerita Pelanggan</span>
-          <h2>Ulasan tulus dari mereka yang sudah berbagi momen manis</h2>
-          <p>
-            Kami percaya setiap bunga punya cerita. Terima kasih sudah
-            mempercayai Fleurélle untuk merangkai momen spesial kalian.
-          </p>
-        </div>
+        <ScrollAnimate animation="fadeInUp" delay={0}>
+          <div className="section-heading">
+            <span className="eyebrow">Cerita Pelanggan</span>
+            <h2>Ulasan tulus dari mereka yang sudah berbagi momen manis</h2>
+            <p>
+              Kami percaya setiap bunga punya cerita. Terima kasih sudah
+              mempercayai Fleurélle untuk merangkai momen spesial kalian.
+            </p>
+          </div>
+        </ScrollAnimate>
       )}
 
-      <div className="reviews-grid">
+      <ScrollAnimate animation="fadeIn" delay={200}>
+        <div className="reviews-grid">
         {REVIEWS.map((review) => (
           <article key={review.id} className="review-card">
             <div
@@ -43,6 +47,7 @@ export const ReviewsSection = ({ compact = false }: ReviewsSectionProps) => {
           </article>
         ))}
       </div>
+      </ScrollAnimate>
     </section>
   );
 };

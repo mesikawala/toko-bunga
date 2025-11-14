@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FEATURED_OCCASIONS } from "../data/content";
 import type { FlowerProduct } from "../data/content";
+import { ScrollAnimate } from "./ScrollAnimate";
 
 type PreviewProductsProps = {
   products: FlowerProduct[];
@@ -53,17 +54,20 @@ export const PreviewProducts = ({
 
   return (
     <section className="preview-section">
-      <div className="section-heading">
-        <span className="eyebrow">Signature Bouquet</span>
-        <h2>Koleksi yang selalu jadi favorit pelanggan kami</h2>
-        <p>
-          Dipilih satu per satu, bunga kami dikurasi dari petani lokal dan
-          import grade A. Setiap buket dirangkai saat ada pesanan agar tetap
-          segar.
-        </p>
-      </div>
+      <ScrollAnimate animation="fadeInUp" delay={0}>
+        <div className="section-heading">
+          <span className="eyebrow">Signature Bouquet</span>
+          <h2>Koleksi yang selalu jadi favorit pelanggan kami</h2>
+          <p>
+            Dipilih satu per satu, bunga kami dikurasi dari petani lokal dan
+            import grade A. Setiap buket dirangkai saat ada pesanan agar tetap
+            segar.
+          </p>
+        </div>
+      </ScrollAnimate>
 
-      <div className="preview-slider">
+      <ScrollAnimate animation="fadeIn" delay={200}>
+        <div className="preview-slider">
         <button
           className="slider-button slider-button--prev"
           onClick={() => handleScroll("prev")}
@@ -105,8 +109,10 @@ export const PreviewProducts = ({
           ›
         </button>
       </div>
+      </ScrollAnimate>
 
-      <div className="occasion-strip">
+      <ScrollAnimate animation="fadeInUp" delay={400}>
+        <div className="occasion-strip">
         {FEATURED_OCCASIONS.map((occasion) => (
           <button
             key={occasion.id}
@@ -119,6 +125,7 @@ export const PreviewProducts = ({
           </button>
         ))}
       </div>
+      </ScrollAnimate>
     </section>
   );
 };

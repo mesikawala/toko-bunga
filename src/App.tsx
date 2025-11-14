@@ -36,6 +36,9 @@ const App = () => {
   const [selectedProduct, setSelectedProduct] = useState<FlowerProduct | null>(
     null
   );
+  const [editingProduct, setEditingProduct] = useState<FlowerProduct | null>(
+    null
+  );
 
   const totalItems = useMemo(
     () => cartItems.reduce((total, item) => total + item.quantity, 0),
@@ -192,6 +195,28 @@ const App = () => {
     setProducts((prev) => [newProduct, ...prev]);
   };
 
+  const handleUpdateProduct = (
+    productId: string,
+    updatedProduct: Omit<FlowerProduct, "id">
+  ) => {
+    setProducts((prev) =>
+      prev.map((p) =>
+        p.id === productId ? { ...updatedProduct, id: productId } : p
+      )
+    );
+    setEditingProduct(null);
+  };
+
+  const handleEditProduct = (product: FlowerProduct) => {
+    setEditingProduct(product);
+    setActiveView("products");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const handleCancelEdit = () => {
+    setEditingProduct(null);
+  };
+
   useEffect(() => {
     const syncSession = async () => {
       const { data } = await supabase.auth.getSession();
@@ -245,8 +270,11 @@ const App = () => {
             {isAdmin && (
               <AdminProductForm
                 onAddProduct={handleAddProduct}
+                onUpdateProduct={handleUpdateProduct}
                 onClearFilter={() => setSelectedOccasion(null)}
                 selectedOccasion={selectedOccasion}
+                editingProduct={editingProduct}
+                onCancelEdit={handleCancelEdit}
               />
             )}
             <ProductGrid
@@ -256,6 +284,8 @@ const App = () => {
               selectedCategory={selectedCategory}
               onSelectCategory={setSelectedCategory}
               onProductClick={handleProductClick}
+              isAdmin={isAdmin}
+              onEditProduct={handleEditProduct}
             />
           </div>
         )}
