@@ -1,9 +1,14 @@
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useScrollAnimation } from "../hooks/useScrollAnimation";
 
 type ScrollAnimateProps = {
   children: ReactNode;
-  animation?: "fadeIn" | "fadeInLeft" | "fadeInRight" | "fadeInUp" | "fadeInDown";
+  animation?:
+    | "fadeIn"
+    | "fadeInLeft"
+    | "fadeInRight"
+    | "fadeInUp"
+    | "fadeInDown";
   threshold?: number;
   delay?: number;
   className?: string;
@@ -28,4 +33,3 @@ export const ScrollAnimate = ({
     </div>
   );
 };
-
